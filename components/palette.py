@@ -1,0 +1,1 @@
+# persistent palette widget

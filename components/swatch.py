@@ -1,0 +1,1 @@
+# singular color swatch on palette

@@ -1,0 +1,1 @@
+# math for simulation of different levels of vision (low vision, low contrast, etc)

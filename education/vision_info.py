@@ -1,0 +1,1 @@
+# reusable info on vision conditions

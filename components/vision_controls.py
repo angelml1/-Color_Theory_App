@@ -1,0 +1,1 @@
+# widget for selecting color blindness and vision effects
