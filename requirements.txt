@@ -1,0 +1,8 @@
+# --- UI ---
+flet==1.0.5
+flet-color-pickers==1.0.5
+
+# --- color math / imaging ---
+numpy>=1.26
+Pillow>=10.0
+scipy>=1.11
