@@ -6,11 +6,12 @@ from components.palette import palette_sidebar
 
 def build_shell(page: ft.Page, palette, pages: dict):
     """pages: {"Home": home.build, ...}, each build(palette) -> ft.Control."""
-    cache = {}                           
+    cache = {} 
     content = ft.Container(expand=True, padding=16)
     nav_buttons = {}
 
     def show(name: str):
+        palette.pick.cancel()
         if name not in cache:
             cache[name] = pages[name](palette)
         content.content = cache[name]
