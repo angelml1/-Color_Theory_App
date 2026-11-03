@@ -1,1 +1,0 @@
-# reusable explanation about color contrast accessibility
