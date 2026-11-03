@@ -4,5 +4,5 @@ flet-color-pickers==1.0.5
 
 # --- color math / imaging ---
 numpy>=1.26
-Pillow>=10.0
+Pillow>=10.1
 scipy>=1.11
