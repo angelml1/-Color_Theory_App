@@ -3,7 +3,7 @@ import flet as ft
 
 from components.layout import build_shell
 from palette_state import Palette
-from pages import color_wheel, accessibility
+from pages import accessibility, color_wheel, upload
 
 
 def main(page: ft.Page):
@@ -12,7 +12,7 @@ def main(page: ft.Page):
     build_shell(page, palette, {
         # "Home": home.build,
         "Color Wheel": color_wheel.build,
-        # "Upload": upload.build,
+        "Upload": lambda palette: upload.build(page, palette),
         # "Sandbox": color_theory.build,
         "Accessibility": accessibility.build,
     })
