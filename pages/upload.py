@@ -146,7 +146,7 @@ class UploadPage:
         if not self.picked:
             return
         if self.on_create_palette:
-            self.on_create_palette(list(self.picked))
+            self.on_create_palette([color["hex"] for color in self.picked])
         else:
             self.notify("Palette: " + ", ".join(p["hex"] for p in self.picked))
 
@@ -441,7 +441,7 @@ def main(page: ft.Page):
 
     upload = UploadPage(page)
 
-    tabs = ["Upload", "Colors", "Palette", "Settings"]
+    tabs = ["Upload", "Colors", "Palette"]
     pages = {"Upload": upload.view}
 
     nav = ft.Row(alignment=ft.MainAxisAlignment.SPACE_AROUND)
