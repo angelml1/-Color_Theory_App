@@ -1,17 +1,23 @@
 # main functionality
 import flet as ft
 
+from components.layout import build_shell
 from palette_state import Palette
-from pages import home
+from pages import accessibility, color_wheel, upload, color_theory
 
 
 def main(page: ft.Page):
-    page.title = "Colour extractor"
+    page.title = "Color Theory App"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.bgcolor = ft.Colors.WHITE
-    page.padding = 0
     palette = Palette()
-    page.add(home.build(palette, page))
+    build_shell(page, palette, {
+        # "Home": home.build,
+        "Color Wheel": color_wheel.build,
+        "Upload": lambda palette: upload.build(page, palette),
+        "Sandbox": color_theory.build,
+        "Accessibility": accessibility.build,
+    })
 
 
 ft.run(main)
