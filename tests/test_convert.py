@@ -25,3 +25,12 @@ def test_valid(text, expected):
                                   "1, 2", "1, 2, 3, 4", "#gggggg", None])
 def test_invalid(text):
     assert parse_color(text) is None
+
+def test_oklab_matches_reference_values():
+    import numpy as np
+    from color_math.convert import oklab_to_srgb, srgb_to_oklab
+    assert np.allclose(srgb_to_oklab([1, 1, 1]), [1, 0, 0], atol=2e-4)
+    assert np.allclose(srgb_to_oklab([1, 0, 0]), [0.628, 0.2249, 0.1258], atol=2e-3)
+    assert np.allclose(srgb_to_oklab([0, 0, 1]), [0.452, -0.0324, -0.3116], atol=2e-3)
+    rgb = np.array([0.23, 0.48, 0.83])
+    assert np.allclose(oklab_to_srgb(srgb_to_oklab(rgb)), rgb, atol=1e-4)
