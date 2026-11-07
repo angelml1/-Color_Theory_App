@@ -3,7 +3,8 @@ import flet as ft
 
 from components.layout import build_shell
 from palette_state import Palette
-from pages import color_wheel, home, upload, color_theory
+# added accessibility back here since home_nav had dropped it
+from pages import accessibility, color_wheel, home, upload, color_theory
 
 
 def main(page: ft.Page):
@@ -16,7 +17,7 @@ def main(page: ft.Page):
         "Color Wheel": color_wheel.build,
         "Upload": lambda palette: upload.build(page, palette),
         "Sandbox": color_theory.build,
-
+        "Accessibility": accessibility.build,  
     })
 
 
