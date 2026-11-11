@@ -1,4 +1,4 @@
-"""Upload / extraction page (Flet).
+"""Upload / extraction page.
 
 
 

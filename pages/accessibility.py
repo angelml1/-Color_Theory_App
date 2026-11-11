@@ -1,5 +1,4 @@
 # accessibility page
-# heads up: home_nav deleted this file, so this got pulled back from main as is, nothing inside changed
 import flet as ft
 
 from color_math.conditions import VisionState, build_pipeline

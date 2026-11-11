@@ -1,3 +1,4 @@
+# helper for image upload color extractor
 from PIL import Image
 
 

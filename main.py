@@ -3,7 +3,6 @@ import flet as ft
 
 from components.layout import build_shell
 from palette_state import Palette
-# added accessibility back here since home_nav had dropped it
 from pages import accessibility, color_wheel, home, upload, color_theory
 
 
