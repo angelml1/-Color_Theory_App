@@ -57,10 +57,6 @@ def build(palette, page: ft.Page) -> ft.Control:
                     [ft.Text("Home", size=22, weight=ft.FontWeight.BOLD), theme_switch],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 ),
-                saved_title,
-                saved_empty,
-                *build_saved_rows(),
-                ft.Divider(height=1),
                 ft.Row(
                     [
                         ft.Text("Current palette", size=18, weight=ft.FontWeight.BOLD),
@@ -72,6 +68,10 @@ def build(palette, page: ft.Page) -> ft.Control:
                 build_current_palette_preview(colors),
                 ft.Row([name_field, save_button], spacing=8, wrap=True),
                 status,
+                ft.Divider(height=1),
+                saved_title,
+                saved_empty,
+                *build_saved_rows(),
             ]
             try:
                 root.update()

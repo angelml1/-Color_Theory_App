@@ -39,9 +39,9 @@ def test_sidebar_save_persists_current_palette_and_notifies(monkeypatch, tmp_pat
     assert load_palettes(path) == expected
     assert notified[-1] == expected
     home_list = home_view.content
-    assert home_list.controls[1].value == "Saved palettes (3)"
+    assert home_list.controls[6].value == "Saved palettes (3)"
     saved_names = [
-        home_list.controls[3 + index * 2].content.controls[0].controls[0].value
+        home_list.controls[8 + index * 2].content.controls[0].controls[0].value
         for index in range(3)
     ]
     assert saved_names == ["Palette 3", "Palette 2", "Palette 1"]
