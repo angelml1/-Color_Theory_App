@@ -16,16 +16,18 @@ def test_home_saved_palette_is_available_after_rebuild(monkeypatch):
     root = home.build(palette, page)
     palette.set(["#123456", "#abcdef"])
 
-    name_field, save_button = root.controls[-2].controls
+    list_view = root.content
+    name_field, save_button = list_view.controls[-2].controls
     name_field.value = "Evening"
     save_button.on_click(None)
 
     assert stored == [{"name": "Evening", "colors": ["#123456", "#abcdef"]}]
 
     rebuilt = home.build(Palette(), SimpleNamespace(services=[]))
-    assert rebuilt.controls[1].value == "Saved palettes (1)"
-    assert rebuilt.controls[2].visible is False
-    assert rebuilt.controls[3].content.controls[0].controls[0].value == "Evening"
+    rebuilt_list = rebuilt.content
+    assert rebuilt_list.controls[1].value == "Saved palettes (1)"
+    assert rebuilt_list.controls[2].visible is False
+    assert rebuilt_list.controls[3].content.controls[0].controls[0].value == "Evening"
 
 
 def test_home_saved_list_scrolls_and_renders_all_palettes(monkeypatch):
@@ -36,10 +38,13 @@ def test_home_saved_list_scrolls_and_renders_all_palettes(monkeypatch):
     monkeypatch.setattr(home, "load_palettes", lambda: palettes)
 
     root = home.build(Palette(), SimpleNamespace(services=[]))
-    assert root.scroll == home.ft.ScrollMode.AUTO
-    assert root.controls[1].value == "Saved palettes (8)"
+    list_view = root.content
+    assert list_view.scroll == home.ft.ScrollMode.AUTO
+    assert list_view.tight is True
+    assert list_view.expand is None
+    assert list_view.controls[1].value == "Saved palettes (8)"
     saved_row_names = [
-        root.controls[3 + index * 2].content.controls[0].controls[0].value
+        list_view.controls[3 + index * 2].content.controls[0].controls[0].value
         for index in range(8)
     ]
     assert saved_row_names == [f"Palette {index}" for index in range(1, 9)]

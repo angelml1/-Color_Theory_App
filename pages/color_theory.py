@@ -23,7 +23,7 @@ from color_math.surround import (describe_shift, effect_strength, matching_color
 from components.contrast_picker import ContrastPicker
 from components.color_theory_ui import (Slider as _Slider, VisionPanel, card as _card,
                                    result_swatch, segmented as _segmented, upd as _upd)
-from components.swatch import swatch
+from components.swatch import addable_swatch, swatch
 from education.color_theory_info import THEORY_INFO
 
 # surround/match previews
@@ -281,7 +281,7 @@ def build(palette) -> ft.Control:
         header = ft.Row([ft.Text(t, weight=ft.FontWeight.BOLD, width=92)
                          for t in ("Original", "In light", "In shadow")], spacing=12)
         r_table.controls = [header] + [
-            ft.Row([ft.Column([swatch(c, size=44, on_click=lambda e, c=c: palette.add(c)),
+            ft.Row([ft.Column([addable_swatch(c, palette, size=44),
                                ft.Text(c, size=11)], spacing=2, width=92,
                               horizontal_alignment=ft.CrossAxisAlignment.CENTER)
                     for c in row], spacing=12)

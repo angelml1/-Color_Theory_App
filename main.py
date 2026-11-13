@@ -9,7 +9,6 @@ from pages import color_wheel, home, upload, color_theory
 def main(page: ft.Page):
     page.title = "Color Theory App"
     page.theme_mode = ft.ThemeMode.LIGHT
-    page.bgcolor = ft.Colors.WHITE
     palette = Palette()
     build_shell(page, palette, {
         "Home": lambda active_palette: home.build(active_palette, page),

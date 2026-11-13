@@ -1,7 +1,7 @@
 # persistent palette widget
 import flet as ft
 
-from components.swatch import swatch
+from components.swatch import removable_swatch
 from palette_library import add_palette, load_palettes, next_palette_name
 
 
@@ -10,7 +10,7 @@ def palette_sidebar(palette) -> ft.Control:
 
     swatch_col = ft.Column(spacing=8, scroll=ft.ScrollMode.AUTO, height=320)
     empty = ft.Text("No colors yet", italic=True)
-    hint = ft.Text("Click a color to remove it", size=11, italic=True)
+    hint = ft.Text("Hover a color and click X to remove it", size=11, italic=True)
     save_status = ft.Text(size=10, color=ft.Colors.GREY_700)
     banner_text = ft.Text(size=12)
     banner = ft.Container(
@@ -45,7 +45,7 @@ def palette_sidebar(palette) -> ft.Control:
 
     body = ft.Column(
         [ft.Text("Palette", weight=ft.FontWeight.BOLD), banner, swatch_col,
-         empty, hint, save_button, save_status, undo],
+         undo, empty, hint, save_button, save_status],
         width=150, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
     )
     toggle_btn = ft.IconButton(icon=ft.Icons.CHEVRON_RIGHT)
@@ -63,9 +63,9 @@ def palette_sidebar(palette) -> ft.Control:
             toggle_btn.icon = ft.Icons.CHEVRON_RIGHT
 
         swatch_col.controls = [
-            swatch(c, size=48, selected=picking,
-                   on_click=(lambda e, c=c: pick.choose(c)) if picking
-                   else (lambda e, c=c: palette.remove(c)))
+            removable_swatch(c, size=48, selected=picking,
+                             on_remove=lambda e, c=c: palette.remove(c),
+                             on_click=(lambda e, c=c: pick.choose(c)) if picking else None)
             for c in palette.colors
         ]
         empty.visible = not palette.colors

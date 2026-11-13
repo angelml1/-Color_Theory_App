@@ -50,9 +50,9 @@ def segmented(options: dict, selected: str, on_change) -> ft.SegmentedButton:
 # color swatch used in ui
 def result_swatch(palette, label: str, hex_color: str, width: int | None = None) -> ft.Control:
     """A result color with its hex and a label. Click to add it to the palette."""
-    from components.swatch import swatch
+    from components.swatch import addable_swatch
     return ft.Column(
-        [swatch(hex_color, size=40, on_click=lambda e, c=hex_color: palette.add(c)),
+        [addable_swatch(hex_color, palette, size=40),
          ft.Text(hex_color, size=11), ft.Text(label, size=11, italic=True)],
         spacing=2, horizontal_alignment=ft.CrossAxisAlignment.CENTER, width=width)
 

@@ -4,7 +4,7 @@ import flet as ft
 from color_math.convert import parse_color
 from color_math.harmony import KINDS, harmony
 from components.color_wheel import ColorWheel
-from components.swatch import swatch
+from components.swatch import addable_swatch, swatch
 from education.harmony_info import HARMONY_INFO
 from palette_state import MAX_COLORS
 
@@ -95,7 +95,8 @@ def build(palette) -> ft.Control:
         count_row.visible = s["kind"] == "monochromatic"
 
         suggestion_row.controls = [
-            swatch(c, selected=c in palette.colors, on_click=lambda e, c=c: toggle(c))
+            addable_swatch(c, palette, selected=c in palette.colors,
+                           on_click=lambda e, c=c: toggle(c))
             for c in cols
         ]
         preview_row.controls = [swatch(c) for c in cols]

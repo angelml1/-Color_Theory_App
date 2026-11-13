@@ -15,9 +15,8 @@ def build(palette, page: ft.Page) -> ft.Control:
 
     status = ft.Text(size=12, color=ft.Colors.GREY_700)
     current_count = ft.Text(size=12, color=ft.Colors.GREY_700)
-    current_swatches = ft.Row(spacing=4, height=48)
     name_field = ft.TextField(
-        hint_text="Palette name", dense=True, expand=True, max_length=40,
+        hint_text="Palette name", dense=True, width=240, max_length=40,
     )
     save_button = ft.FilledButton(
         "Save palette", icon=ft.Icons.SAVE_OUTLINED,
@@ -25,7 +24,19 @@ def build(palette, page: ft.Page) -> ft.Control:
     )
     saved_empty = ft.Text("No palettes saved yet.", italic=True)
     saved_title = ft.Text(size=18, weight=ft.FontWeight.BOLD)
+
+    def toggle_theme(e):
+        page.theme_mode = (ft.ThemeMode.DARK if e.control.value
+                           else ft.ThemeMode.LIGHT)
+        page.update()
+
+    theme_switch = ft.Switch(
+        label="Dark mode",
+        value=getattr(page, "theme_mode", None) == ft.ThemeMode.DARK,
+        on_change=toggle_theme,
+    )
     root = None
+    list_view = None
 
     def set_status(message: str):
         status.value = message
@@ -38,27 +49,14 @@ def build(palette, page: ft.Page) -> ft.Control:
         colors = list(palette.colors)
         current_count.value = f"{len(colors)} of {MAX_COLORS} colors"
         save_button.disabled = not colors
-        current_swatches.controls = [
-            ft.Container(
-                expand=1,
-                height=44,
-                bgcolor=color,
-                tooltip=f"Remove {color}",
-                border=ft.Border.all(1, ft.Colors.BLACK_12),
-                on_click=lambda e, color=color: palette.remove(color),
-            )
-            for color in colors
-        ]
-        if not colors:
-            current_swatches.controls = [
-                ft.Text("Your palette is empty. Add colors from Color Wheel or Upload.",
-                        italic=True, color=ft.Colors.GREY_700)
-            ]
         saved_title.value = f"Saved palettes ({len(saved_palettes)})"
         saved_empty.visible = not saved_palettes
         if root is not None:
-            root.controls = [
-                ft.Text("Home", size=22, weight=ft.FontWeight.BOLD),
+            list_view.controls = [
+                ft.Row(
+                    [ft.Text("Home", size=22, weight=ft.FontWeight.BOLD), theme_switch],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                ),
                 saved_title,
                 saved_empty,
                 *build_saved_rows(),
@@ -71,7 +69,7 @@ def build(palette, page: ft.Page) -> ft.Control:
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 ),
-                current_swatches,
+                build_current_palette_preview(colors),
                 ft.Row([name_field, save_button], spacing=8, wrap=True),
                 status,
             ]
@@ -181,6 +179,31 @@ def build(palette, page: ft.Page) -> ft.Control:
                 rows.append(ft.Divider(height=1))
         return rows
 
+    def build_current_palette_preview(colors: list[str]) -> ft.Control:
+        if not colors:
+            return ft.Container(
+                content=ft.Text(
+                    "Your palette is empty. Add colors from Color Wheel or Upload.",
+                    italic=True,
+                    color=ft.Colors.GREY_700,
+                ),
+                height=24,
+                alignment=ft.Alignment(-1, 0),
+            )
+
+        return ft.Row(
+            [
+                swatch(
+                    color,
+                    size=44,
+                    on_click=lambda e, color=color: palette.remove(color),
+                )
+                for color in colors
+            ],
+            spacing=6,
+            wrap=True,
+        )
+
     async def export_saved(item):
         safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", item["name"]).strip("._")
         safe_name = safe_name or "palette"
@@ -193,11 +216,15 @@ def build(palette, page: ft.Page) -> ft.Control:
         )
 
     palette.subscribe(render)
-    root = ft.ListView(
+    list_view = ft.Column(
         controls=[],
         spacing=12,
-        expand=True,
+        tight=True,
         scroll=ft.ScrollMode.AUTO,
+    )
+    root = ft.Container(
+        content=list_view,
+        expand=True,
     )
     subscribe_palettes(on_saved_palettes_changed)
     render()
