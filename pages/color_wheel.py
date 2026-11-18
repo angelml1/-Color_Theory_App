@@ -1,9 +1,10 @@
 # color wheel palette generator page
 import flet as ft
 
-from color_math.convert import parse_color
+from color_math.convert import describe_color, parse_color
 from color_math.harmony import KINDS, harmony
 from components.color_wheel import ColorWheel
+from components.dialogs import PALETTE_FULL, PALETTE_UPDATED, SWATCH_ADDED, SWATCH_REMOVED, toast
 from components.swatch import swatch
 from education.harmony_info import HARMONY_INFO
 from palette_state import MAX_COLORS
@@ -22,32 +23,30 @@ LABELS = {
 
 
 def build(palette) -> ft.Control:
-    s = {"mode": "manual", "base": "#3a7bd5", "kind": None,
-         "count": 5, "format": "HEX"}
+    s = {"mode": "manual", "base": "#3a7bd5", "kind": None, "count": 5}
 
     # --- controls that render() updates ------------------------------------
     color_input = ft.TextField(
         width=210, dense=True, text_align=ft.TextAlign.CENTER,
-        hint_text="#RRGGBB or R, G, B",
+        label="HEX or RGB", hint_text="#RRGGBB or R, G, B",
     )
+    codes_row = ft.Row(wrap=True, spacing=20, alignment=ft.MainAxisAlignment.CENTER)
     suggestion_row = ft.Row(wrap=True, spacing=10, alignment=ft.MainAxisAlignment.CENTER)
     preview_row = ft.Row(wrap=True, spacing=10, alignment=ft.MainAxisAlignment.CENTER)
     info_title = ft.Text(weight=ft.FontWeight.BOLD, size=16)
     info_text = ft.Text()
 
-	# Number of colors for monochromatic option
     count_field = ft.TextField(
         value=str(s["count"]), width=70, text_align=ft.TextAlign.CENTER,
         keyboard_type=ft.KeyboardType.NUMBER, dense=True,
     )
-    count_row = ft.Row( 
+    count_row = ft.Row(
         [ft.Text("Colors"),
          ft.IconButton(ft.Icons.REMOVE, on_click=lambda e: set_count(s["count"] - 1)),
          count_field,
          ft.IconButton(ft.Icons.ADD, on_click=lambda e: set_count(s["count"] + 1))],
         alignment=ft.MainAxisAlignment.CENTER,
     )
-    
     manual_box = ft.Column(
         [ft.Text("Click a color to add it to (or remove it from) your palette"),
          suggestion_row],
@@ -63,15 +62,19 @@ def build(palette) -> ft.Control:
     def colors() -> list[str]:
         return harmony(s["base"], s["kind"], s["count"])
 
-	# add/remove colors from palette in manual mode
-    def toggle(hex_color: str):
+    def toggle(hex_color: str):                 # manual: suggestion clicked
         if hex_color in palette.colors:
             palette.remove(hex_color)
+            toast(root.page, SWATCH_REMOVED)
+        elif len(palette.colors) >= MAX_COLORS:
+            toast(root.page, PALETTE_FULL)
         else:
             palette.add(hex_color)
+            toast(root.page, SWATCH_ADDED)
 
-    def generate(): 
+    def generate():                             # generate: replace the palette
         palette.set(colors())
+        toast(root.page, PALETTE_UPDATED)
 
     def set_count(value):
         try:
@@ -100,19 +103,20 @@ def build(palette) -> ft.Control:
         ]
         preview_row.controls = [swatch(c) for c in cols]
 
-        base = s["base"]
         color_input.error_text = None
-        if s["format"] == "RGB":
-            r, g, b = (int(base[i:i + 2], 16) for i in (1, 3, 5))
-            color_input.value = f"rgb({r}, {g}, {b})"
-        else:
-            color_input.value = base
+        color_input.value = s["base"]
+        codes_row.controls = [
+            ft.Column([ft.Text(name, size=11, weight=ft.FontWeight.BOLD),
+                       ft.Text(value, selectable=True, font_family="monospace")],
+                      spacing=0, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+            for name, value in describe_color(s["base"]).items() if name != "HEX"
+        ]
 
         info = HARMONY_INFO.get(s["kind"] or NONE, {})
         info_title.value = info.get("title", "")
         info_text.value = info.get("text", "")
 
-        try:     
+        try:                 
             root.update()
         except Exception:
             pass
@@ -126,10 +130,6 @@ def build(palette) -> ft.Control:
         s["mode"] = next(iter(e.control.selected))
         render()
 
-    def on_format(e):
-        s["format"] = next(iter(e.control.selected))
-        render()
-
     def on_kind(e):
         value = e.control.value
         s["kind"] = None if value == NONE else value
@@ -141,13 +141,13 @@ def build(palette) -> ft.Control:
             color_input.error_text = "Use #RRGGBB or R, G, B (0 to 255)"
             color_input.update()
             return
-        wheel.set(parsed) 
+        wheel.set(parsed)              
         on_pick(parsed)
 
     color_input.on_submit = apply_input
     color_input.on_blur = apply_input
 
-    palette.subscribe(render) 
+    palette.subscribe(render)        
 
     # --- widgets -----------------------------------------------------------
     wheel = ColorWheel(on_pick, initial=s["base"])
@@ -156,11 +156,6 @@ def build(palette) -> ft.Control:
         selected=["manual"], on_change=on_mode,
         segments=[ft.Segment(value="manual", label=ft.Text("Manual")),
                   ft.Segment(value="generate", label=ft.Text("Generate"))],
-    )
-    fmt = ft.SegmentedButton(
-        selected=["HEX"], on_change=on_format,
-        segments=[ft.Segment(value="RGB", label=ft.Text("RGB")),
-                  ft.Segment(value="HEX", label=ft.Text("HEX"))],
     )
     kind_group = ft.RadioGroup(
         value=NONE, on_change=on_kind,
@@ -174,7 +169,8 @@ def build(palette) -> ft.Control:
     root = ft.Column(
         [ft.Row([mode], alignment=ft.MainAxisAlignment.CENTER),
          wheel.control,
-         ft.Row([fmt, color_input], alignment=ft.MainAxisAlignment.CENTER),
+         ft.Row([color_input, codes_row], alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER, spacing=24, wrap=True),
          count_row,
          manual_box,
          generate_box,

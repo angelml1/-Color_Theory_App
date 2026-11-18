@@ -58,3 +58,15 @@ def test_listeners_are_notified():
     p.pick.start("slot", "x", lambda c: None)
     p.pick.cancel()
     assert len(calls) == 2
+
+def test_add_reports_whether_it_added():
+    p = Palette()
+    assert p.add("#abcdef") is True
+    assert p.add("#abcdef") is False
+
+
+def test_add_returns_false_when_full():
+    p = Palette()
+    for i in range(MAX_COLORS):
+        assert p.add(f"#{i:06x}") is True
+    assert p.add("#ffffff") is False

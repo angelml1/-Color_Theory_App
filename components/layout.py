@@ -6,12 +6,13 @@ from components.palette import palette_sidebar
 
 def build_shell(page: ft.Page, palette, pages: dict):
     """pages: {"Home": home.build, ...}, each build(palette) -> ft.Control."""
-    cache = {} 
+    cache = {}                                
     content = ft.Container(expand=True, padding=16)
     nav_buttons = {}
 
     def show(name: str):
-        palette.pick.cancel()
+        # leaving a page ends any eyedropper session
+        palette.pick.cancel()                    
         if name not in cache:
             cache[name] = pages[name](palette)
         content.content = cache[name]
@@ -25,7 +26,7 @@ def build_shell(page: ft.Page, palette, pages: dict):
 
     nav = ft.Container(ft.Row(list(nav_buttons.values()), spacing=4), padding=8)
     body = ft.Row([content, palette_sidebar(palette)],
-                  expand=True, vertical_alignment=ft.CrossAxisAlignment.START)
+                  expand=True, vertical_alignment=ft.CrossAxisAlignment.STRETCH)
 
     page.add(ft.Column([nav, ft.Divider(height=1), body], expand=True))
     show(next(iter(pages)))

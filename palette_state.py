@@ -67,9 +67,11 @@ class Palette:
         self.colors = list(colors)[:MAX_COLORS]
         self._notify()
 
-    def add(self, hex_color: str):
+    def add(self, hex_color: str) -> bool:
         if hex_color not in self.colors and len(self.colors) < MAX_COLORS:
             self.set(self.colors + [hex_color])
+            return True
+        return False
 
     def remove(self, hex_color: str):
         if hex_color in self.colors:
