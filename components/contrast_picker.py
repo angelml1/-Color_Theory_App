@@ -28,16 +28,14 @@ class ContrastPicker:
             on_submit=self._apply, on_blur=self._apply,
         )
         self.dropper = ft.IconButton(
-            ft.Icons.COLORIZE, tooltip="Eyedropper: pick from your palette or the screen",
+            ft.Icons.COLORIZE, tooltip="Eyedropper: pick from your palette",
             on_click=self._toggle_dropper,
         )
-        self.screen_btn = ft.TextButton("Pick from screen", visible=False,
-                                        on_click=self._pick_screen)
 
         self.control = ft.Column(
             [ft.Text(label, weight=ft.FontWeight.BOLD),
              ft.Row([self.chip, self.field, self.dropper]),
-             self.screen_btn],
+            ],
             spacing=6,
         )
         palette.pick.subscribe(self._on_pick_change)
@@ -59,12 +57,7 @@ class ContrastPicker:
         mine = self._mine()
         self.dropper.style = ft.ButtonStyle(
             bgcolor=ft.Colors.PRIMARY_CONTAINER if mine else None)
-        self.screen_btn.visible = mine
         _upd(self.control)
-
-    def _pick_screen(self, e):
-        self.palette.pick.cancel()
-        pick_from_screen(self.control.page, self.set)
 
     # --- typed input ---------------------------------------------------------------
     def _apply(self, e):
