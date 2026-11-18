@@ -23,6 +23,13 @@ def hex_to_hsv(hex_color: str) -> tuple[float, float, float]:
     return h * 360, s, v
 
 
+def hex_to_hsl(hex_color: str) -> tuple[float, float, float]:
+    """'#rrggbb' -> (hue 0-360, saturation 0-1, lightness 0-1)"""
+    r, g, b = (int(hex_color[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    return h * 360, s, l
+
+
 def hsv_to_hex(h: float, s: float, v: float) -> str:
     """(hue in degrees, saturation 0-1, value 0-1) -> '#rrggbb'"""
     s = min(max(s, 0.0), 1.0)
@@ -40,6 +47,19 @@ def srgb_to_linear(a) -> np.ndarray:
 def linear_to_srgb(a) -> np.ndarray:
     a = np.clip(np.asarray(a, dtype=float), 0.0, 1.0)
     return np.where(a <= 0.0031308, a * 12.92, 1.055 * a ** (1 / 2.4) - 0.055)
+
+
+def describe_color(hex_color: str) -> dict[str, str]:
+    """The text shown in the color info window, in display order."""
+    r, g, b = hex_to_rgb(hex_color)
+    h, s, v = hex_to_hsv(hex_color)
+    hl, sl, ll = hex_to_hsl(hex_color)
+    return {
+        "HEX": hex_color.lower(),
+        "RGB": f"rgb({r}, {g}, {b})",
+        "HSL": f"hsl({hl:.0f}, {sl * 100:.0f}%, {ll * 100:.0f}%)",
+        "HSV": f"hsv({h:.0f}, {s * 100:.0f}%, {v * 100:.0f}%)",
+    }
 
 # Oklab conversion added by Cori
 

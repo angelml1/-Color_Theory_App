@@ -1,6 +1,25 @@
 import pytest
-from color_math.convert import hex_to_hsv, hsv_to_hex, parse_color
+from color_math.convert import hex_to_hsv, hsv_to_hex, parse_color, describe_color, hex_to_hsl
 
+
+def test_hsl_of_primaries_and_neutrals():
+    assert hex_to_hsl("#ff0000") == (0.0, 1.0, 0.5)
+    assert hex_to_hsl("#ffffff")[2] == 1.0
+    assert hex_to_hsl("#000000")[2] == 0.0
+
+
+def test_describe_color_red():
+    assert describe_color("#FF0000") == {
+        "HEX": "#ff0000",
+        "RGB": "rgb(255, 0, 0)",
+        "HSL": "hsl(0, 100%, 50%)",
+        "HSV": "hsv(0, 100%, 100%)",
+    }
+
+
+def test_describe_color_white():
+    d = describe_color("#ffffff")
+    assert d["HSL"] == "hsl(0, 0%, 100%)" and d["HSV"] == "hsv(0, 0%, 100%)"
 
 def test_roundtrip_is_exact_for_8bit_colors():
     for c in ["#000000", "#ffffff", "#3a7bd5", "#ff0000", "#12ab9f"]:
