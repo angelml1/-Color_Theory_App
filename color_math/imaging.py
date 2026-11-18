@@ -6,7 +6,6 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from color_math.contrast import readable_text_color
-from color_math.convert import rgb_to_hex
 from color_math.vision_effects import from_pil, to_pil
 
 
@@ -58,21 +57,3 @@ def image_to_b64(im: Image.Image) -> str:
 
 def to_png_b64(arr: np.ndarray) -> str:
     return image_to_b64(to_pil(arr))
-
-
-# --- eyedropper helpers --------------------------------------------------------
-def grab_screen() -> Image.Image:
-    """Screenshot of the whole desktop."""
-    from PIL import ImageGrab
-    try:
-        return ImageGrab.grab(all_screens=True).convert("RGB")
-    except TypeError:
-        return ImageGrab.grab().convert("RGB")
-
-
-def pixel_at(im: Image.Image, x: float, y: float) -> str:
-    """'#rrggbb' of the pixel at (x, y), clamped to the image bounds."""
-    x = min(max(int(x), 0), im.width - 1)
-    y = min(max(int(y), 0), im.height - 1)
-    r, g, b = im.convert("RGB").getpixel((x, y))
-    return rgb_to_hex(r, g, b)

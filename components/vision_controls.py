@@ -18,14 +18,15 @@ class VisionControls:
     """Two controls for the two cards on the Vision tab:
     .cvd_control      single-select color blindness groups + one severity slider
     .effects_control  vision perception switches, each with its own slider
-    Calls on_change(VisionState) after every change."""
+    Calls on_change(VisionState, live) after every change. live=True means a
+    slider moved, so only the preview needs to be redrawn."""
 
     def __init__(self, on_change):
         self.on_change = on_change
         self.cvd_key: str | None = None
         self.effects: dict[str, float] = {}
 
-        # --- color blindness --------
+        # --- color blindness: one radio group spanning the expandable groups --------
         tiles = [
             ft.ExpansionTile(
                 title=ft.Text(group),
@@ -41,21 +42,23 @@ class VisionControls:
         )
         self.cvd_name = ft.Text(weight=ft.FontWeight.BOLD)
         self.cvd_scale = ft.Text(size=12, italic=True)
-        self.cvd_slider = ft.Slider(min=0, max=1, divisions=20, value=1.0,
-                                    label="{value}", on_change_end=self._on_cvd_slider)
+        self.cvd_slider = ft.Slider(
+            min=0, max=1, value=1.0, divisions=20, round=2, label="{value}",
+            on_change=self._on_cvd_slider, on_change_end=self._on_cvd_slider)
         self.cvd_box = ft.Column([self.cvd_name, self.cvd_scale, self.cvd_slider],
                                  visible=False, spacing=2)
         self.cvd_control = ft.Column([self.cvd_group, self.cvd_box], spacing=8)
 
-        # --- vision perception ---------------------------------------------
+        # --- vision perception: any number ---------------------------------------------
         self.switches, self.sliders, self.boxes = {}, {}, {}
         rows = []
         for key, cond in EFFECT_CONDITIONS.items():
             switch = ft.Switch(label=cond.label, value=False,
                                on_change=lambda e, k=key: self._on_effect(k))
-            slider = ft.Slider(min=0, max=1, divisions=20, value=cond.default,
-                               label="{value}",
-                               on_change_end=lambda e, k=key: self._on_effect_slider(k))
+            slider = ft.Slider(
+                min=0, max=1, divisions=20, value=cond.default, label="{value}",
+                on_change=lambda e, k=key: self._on_effect_slider(k),
+                on_change_end=lambda e, k=key: self._on_effect_slider(k))
             box = ft.Column([ft.Text("Severity", size=12), slider], visible=False, spacing=0)
             self.switches[key], self.sliders[key], self.boxes[key] = switch, slider, box
             rows.append(ft.Column([switch, box], spacing=0))
@@ -69,8 +72,8 @@ class VisionControls:
         cvd = (self.cvd_key, self.cvd_slider.value) if self.cvd_key else None
         return VisionState(cvd=cvd, effects=dict(self.effects))
 
-    def _emit(self):
-        self.on_change(self.state())
+    def _emit(self, live: bool = False):
+        self.on_change(self.state(), live)
 
     # --- handlers -----------------------------------------------------------------------
     def _on_cvd(self, e):
@@ -87,7 +90,7 @@ class VisionControls:
 
     def _on_cvd_slider(self, e):
         if self.cvd_key:
-            self._emit()
+            self._emit(live=True)
 
     def _on_effect(self, key: str):
         on = self.switches[key].value
@@ -102,7 +105,7 @@ class VisionControls:
     def _on_effect_slider(self, key: str):
         if self.switches[key].value:
             self.effects[key] = self.sliders[key].value
-            self._emit()
+            self._emit(live=True)
 
     def reset(self):
         self.cvd_key = None

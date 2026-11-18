@@ -19,7 +19,7 @@ class Condition:
     order: int = 0                      
 
 
-SEVERITY_LABEL = "Severity: 1 = complete (-opia), lower = partial (-anomaly)"
+SEVERITY_LABEL = "Severity: 1 = complete (-opia), <1 = partial (-anomaly)"
 
 # single select
 CVD_CONDITIONS = {

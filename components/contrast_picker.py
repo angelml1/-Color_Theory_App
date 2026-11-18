@@ -2,7 +2,6 @@
 import flet as ft
 
 from color_math.convert import parse_color
-from components.screen_picker import pick_from_screen
 
 
 def _upd(control):
@@ -53,7 +52,8 @@ class ContrastPicker:
         if self._mine():
             pick.cancel()
         else:
-            pick.start(self, self.label, self.set)    # sidebar enters select mode
+            # sidebar enters select mode
+            pick.start(self, self.label, self.set)    
 
     def _on_pick_change(self):
         mine = self._mine()
@@ -75,7 +75,8 @@ class ContrastPicker:
             return
         self.field.error_text = None
         if parsed == self.value:  
-            self.field.value = parsed                 # normalizes '#abc' -> '#aabbcc'
+            # normalizes '#abc' -> '#aabbcc'
+            self.field.value = parsed                 
             _upd(self.field)
             return
         self.set(parsed)
